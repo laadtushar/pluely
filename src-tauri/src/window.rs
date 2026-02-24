@@ -19,11 +19,37 @@ pub fn setup_main_window(app: &mut App) -> Result<(), Box<dyn std::error::Error>
 
     position_window_top_center(&window, TOP_OFFSET)?;
 
-    // Set window as non-focusable on Windows
-    // #[cfg(target_os = "windows")]
-    // {
-    //     let _ = window.set_focusable(false);
-    // }
+    // Set window as non-focusable on Windows to prevent focus detection
+    // This prevents the window from being detected as active when switching between apps
+    #[cfg(target_os = "windows")]
+    {
+        // Attempt to set window as non-focusable using Tauri's API
+        let _ = window.set_focusable(false);
+
+        // Ensure the window stays on top (alwaysOnTop is also set in config)
+        let _ = window.set_always_on_top(true);
+    }
+
+    // Set up window event listener to prevent focus blur detection
+    let window_clone = window.clone();
+    window.on_window_event(move |event| {
+        use tauri::WindowEvent;
+
+        match event {
+            WindowEvent::Focused(false) => {
+                // Window lost focus - ensure it stays visible and on top
+                // Only do this for Windows platform to maintain stealth
+                #[cfg(target_os = "windows")]
+                {
+                    // Ensure window stays visible and on top without actually focusing
+                    // (focusing would be detectable)
+                    let _ = window_clone.show();
+                    let _ = window_clone.set_always_on_top(true);
+                }
+            }
+            _ => {}
+        }
+    });
 
     Ok(())
 }
