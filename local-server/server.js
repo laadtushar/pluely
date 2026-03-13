@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import { Readable } from "node:stream";
 
 const app = express();
 app.use(cors());
@@ -280,7 +281,7 @@ app.post("/groq/v1/chat/completions", async (req, res) => {
     });
     res.status(response.status);
     res.setHeader("Content-Type", response.headers.get("content-type") || "application/json");
-    response.body.pipe(res);
+    Readable.fromWeb(response.body).pipe(res);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
