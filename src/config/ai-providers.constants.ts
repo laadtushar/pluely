@@ -123,8 +123,41 @@ export const AI_PROVIDERS = [
     curl: `curl -X POST http://localhost:11434/v1/chat/completions \\
     -H "Content-Type: application/json" \\
     -d '{
-    "model": "{{MODEL}}",
+    "model": "qwen2.5-coder:14b",
+    "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}]}]
+  }'`,
+    responseContentPath: "choices[0].message.content",
+    streaming: true,
+  },
+  {
+    id: "ollama-fast",
+    curl: `curl -X POST http://localhost:11434/v1/chat/completions \\
+    -H "Content-Type: application/json" \\
+    -d '{
+    "model": "qwen2.5-coder:1.5b",
+    "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}]}]
+  }'`,
+    responseContentPath: "choices[0].message.content",
+    streaming: true,
+  },
+  {
+    id: "ollama-vision",
+    curl: `curl -X POST http://localhost:11434/v1/chat/completions \\
+    -H "Content-Type: application/json" \\
+    -d '{
+    "model": "llama3.2-vision:11b",
     "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,{{IMAGE}}"}}]}]
+  }'`,
+    responseContentPath: "choices[0].message.content",
+    streaming: true,
+  },
+  {
+    id: "ollama-reasoning",
+    curl: `curl -X POST http://localhost:11434/v1/chat/completions \\
+    -H "Content-Type: application/json" \\
+    -d '{
+    "model": "phi4-reasoning:14b",
+    "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}]}]
   }'`,
     responseContentPath: "choices[0].message.content",
     streaming: true,

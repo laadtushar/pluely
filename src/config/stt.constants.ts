@@ -1,5 +1,14 @@
 export const SPEECH_TO_TEXT_PROVIDERS = [
   {
+    id: "local-whisper",
+    name: "Local Whisper (faster-whisper)",
+    curl: `curl -X POST "http://localhost:8000/v1/audio/transcriptions" \\
+      -F "file={{AUDIO}}" \\
+      -F "model=Systran/faster-whisper-base"`,
+    responseContentPath: "text",
+    streaming: false,
+  },
+  {
     id: "openai-whisper",
     name: "OpenAI Whisper",
     curl: `curl -X POST "https://api.openai.com/v1/audio/transcriptions" \\
