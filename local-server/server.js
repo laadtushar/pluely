@@ -92,18 +92,17 @@ app.get("/api/response", (req, res) => {
     customer_name: "Local User",
     license_key: licenseKey,
     instance_id: instanceId,
-    user_audio:
-      provider === "ollama"
-        ? null
-        : {
-            url: getAudioUrl(),
-            fallback_url: null,
-            model: getAudioModel(),
-            fallback_model: null,
-            user_token: getApiKey(),
-            fallback_user_token: null,
-            headers: null,
-          },
+    user_audio: process.env.CUSTOM_AUDIO_URL
+      ? {
+          url: getAudioUrl(),
+          fallback_url: null,
+          model: getAudioModel(),
+          fallback_model: null,
+          user_token: getApiKey(),
+          fallback_user_token: null,
+          headers: null,
+        }
+      : null,
     errors: [],
   });
 });

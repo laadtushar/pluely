@@ -323,6 +323,15 @@ pub async fn validate_license_api(app: AppHandle) -> Result<ValidateResponse, St
         app_version: app_version.clone(),
     };
 
+    // Local-dev: bypass license check when PAYMENT_ENDPOINT points to localhost
+    if payment_endpoint.contains("localhost") || payment_endpoint.contains("127.0.0.1") {
+        return Ok(ValidateResponse {
+            is_active: true,
+            last_validated_at: Some("2099-01-01T00:00:00Z".to_string()),
+            is_dev_license: true,
+        });
+    }
+
     if license_key.is_empty() || instance_id.is_empty() {
         return Ok(ValidateResponse {
             is_active: false,
