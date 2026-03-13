@@ -1,0 +1,15 @@
+{
+  "name": "pluely-local-server",
+  "version": "1.0.0",
+  "description": "Local mock backend for Pluely",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "dotenv": "^16.4.5",
+    "cors": "^2.8.5"
+  }
+}
