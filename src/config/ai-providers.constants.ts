@@ -145,6 +145,17 @@ export const AI_PROVIDERS = [
     curl: `curl -X POST http://localhost:11434/v1/chat/completions \\
     -H "Content-Type: application/json" \\
     -d '{
+    "model": "qwen2.5vl:7b",
+    "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,{{IMAGE}}"}}]}]
+  }'`,
+    responseContentPath: "choices[0].message.content",
+    streaming: true,
+  },
+  {
+    id: "ollama-vision-hd",
+    curl: `curl -X POST http://localhost:11434/v1/chat/completions \\
+    -H "Content-Type: application/json" \\
+    -d '{
     "model": "llama3.2-vision:11b",
     "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,{{IMAGE}}"}}]}]
   }'`,
