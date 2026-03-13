@@ -119,6 +119,42 @@ export const AI_PROVIDERS = [
     streaming: true,
   },
   {
+    id: "groq-instant",
+    curl: `curl https://api.groq.com/openai/v1/chat/completions \\
+    -H "Content-Type: application/json" \\
+    -H "Authorization: Bearer {{API_KEY}}" \\
+    -d '{"model": "llama-3.1-8b-instant", "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}]}], "stream": true}'`,
+    responseContentPath: "choices[0].message.content",
+    streaming: true,
+  },
+  {
+    id: "groq-large",
+    curl: `curl https://api.groq.com/openai/v1/chat/completions \\
+    -H "Content-Type: application/json" \\
+    -H "Authorization: Bearer {{API_KEY}}" \\
+    -d '{"model": "llama-3.3-70b-versatile", "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}]}], "stream": true}'`,
+    responseContentPath: "choices[0].message.content",
+    streaming: true,
+  },
+  {
+    id: "groq-reasoning",
+    curl: `curl https://api.groq.com/openai/v1/chat/completions \\
+    -H "Content-Type: application/json" \\
+    -H "Authorization: Bearer {{API_KEY}}" \\
+    -d '{"model": "deepseek-r1-distill-llama-70b", "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}]}], "stream": true}'`,
+    responseContentPath: "choices[0].message.content",
+    streaming: true,
+  },
+  {
+    id: "groq-vision",
+    curl: `curl https://api.groq.com/openai/v1/chat/completions \\
+    -H "Content-Type: application/json" \\
+    -H "Authorization: Bearer {{API_KEY}}" \\
+    -d '{"model": "llama-3.2-11b-vision-preview", "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,{{IMAGE}}"}}]}], "stream": true}'`,
+    responseContentPath: "choices[0].message.content",
+    streaming: true,
+  },
+  {
     id: "ollama",
     curl: `curl -X POST http://localhost:11434/v1/chat/completions \\
     -H "Content-Type: application/json" \\
@@ -168,6 +204,28 @@ export const AI_PROVIDERS = [
     -H "Content-Type: application/json" \\
     -d '{
     "model": "phi4-reasoning:14b",
+    "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}]}]
+  }'`,
+    responseContentPath: "choices[0].message.content",
+    streaming: true,
+  },
+  {
+    id: "ollama-3b",
+    curl: `curl -X POST http://localhost:11434/v1/chat/completions \\
+    -H "Content-Type: application/json" \\
+    -d '{
+    "model": "qwen2.5-coder:3b",
+    "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}]}]
+  }'`,
+    responseContentPath: "choices[0].message.content",
+    streaming: true,
+  },
+  {
+    id: "ollama-deepseek",
+    curl: `curl -X POST http://localhost:11434/v1/chat/completions \\
+    -H "Content-Type: application/json" \\
+    -d '{
+    "model": "deepseek-coder:1.3b",
     "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}]}]
   }'`,
     responseContentPath: "choices[0].message.content",

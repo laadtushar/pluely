@@ -25,6 +25,20 @@ function getApiKey() {
   return process.env.AI_API_KEY || "";
 }
 
+function getGroqApiKey() {
+  return process.env.GROQ_API_KEY || process.env.GROK_API_KEY || "";
+}
+
+function isGroqModel(model) {
+  return [
+    "llama-3.1-8b-instant",
+    "llama-3.3-70b-versatile",
+    "deepseek-r1-distill-llama-70b",
+    "llama-3.2-11b-vision-preview",
+    "qwen-qwq-32b",
+  ].includes(model);
+}
+
 function getModel() {
   return process.env.AI_MODEL || "gpt-4o";
 }
@@ -82,10 +96,13 @@ app.get("/api/response", (req, res) => {
   const licenseKey = req.headers["license_key"] || "local-license";
   const instanceId = req.headers["instance"] || "local-instance";
 
+  const requestedModel = req.headers["model"] || getModel();
+  const useGroq = isGroqModel(requestedModel);
+
   res.json({
-    url: getChatUrl(),
-    user_token: getApiKey(),
-    model: req.headers["model"] || getModel(),
+    url: useGroq ? "https://api.groq.com/openai/v1/chat/completions" : getChatUrl(),
+    user_token: useGroq ? getGroqApiKey() : getApiKey(),
+    model: requestedModel,
     body: "{}",
     customer_id: null,
     customer_email: null,
@@ -155,6 +172,60 @@ app.post("/api/models", (req, res) => {
         description: "High quality vision — detailed image analysis",
         modality: "vision",
         isAvailable: true,
+      },
+      {
+        provider: "ollama-3b",
+        name: "Qwen2.5 Coder 3B (Fast)",
+        id: "qwen2.5-coder:3b",
+        model: "qwen2.5-coder:3b",
+        description: "Fast and accurate — great balance for Python and SQL",
+        modality: "text",
+        isAvailable: true,
+      },
+      {
+        provider: "ollama-deepseek",
+        name: "DeepSeek Coder 1.3B (Fastest)",
+        id: "deepseek-coder:1.3b",
+        model: "deepseek-coder:1.3b",
+        description: "Smallest and fastest — instant code completions",
+        modality: "text",
+        isAvailable: true,
+      },
+      {
+        provider: "groq-instant",
+        name: "Groq Llama 3.1 8B (Cloud Fast)",
+        id: "llama-3.1-8b-instant",
+        model: "llama-3.1-8b-instant",
+        description: "~500 tok/s — fastest cloud model for Python, SQL, interviews",
+        modality: "text",
+        isAvailable: !!getGroqApiKey(),
+      },
+      {
+        provider: "groq-large",
+        name: "Groq Llama 3.3 70B (Cloud Best)",
+        id: "llama-3.3-70b-versatile",
+        model: "llama-3.3-70b-versatile",
+        description: "Best quality cloud — complex algorithms and system design",
+        modality: "text",
+        isAvailable: !!getGroqApiKey(),
+      },
+      {
+        provider: "groq-reasoning",
+        name: "Groq DeepSeek R1 70B (Cloud Reasoning)",
+        id: "deepseek-r1-distill-llama-70b",
+        model: "deepseek-r1-distill-llama-70b",
+        description: "Step-by-step reasoning — hard LeetCode and system design",
+        modality: "text",
+        isAvailable: !!getGroqApiKey(),
+      },
+      {
+        provider: "groq-vision",
+        name: "Groq Llama 3.2 Vision 11B (Cloud Vision)",
+        id: "llama-3.2-11b-vision-preview",
+        model: "llama-3.2-11b-vision-preview",
+        description: "Fast cloud vision — read whiteboard problems instantly",
+        modality: "vision",
+        isAvailable: !!getGroqApiKey(),
       },
     ],
   });
