@@ -325,6 +325,17 @@ pub async fn deactivate_license_api(app: AppHandle) -> Result<ActivationResponse
 pub async fn validate_license_api(app: AppHandle) -> Result<ValidateResponse, String> {
     // Get payment endpoint and API access key from environment
     let payment_endpoint = get_payment_endpoint()?;
+
+    // Local-dev: bypass license check when PAYMENT_ENDPOINT points to localhost
+    // Must be checked BEFORE get_stored_credentials which errors if no storage file exists
+    if payment_endpoint.contains("localhost") || payment_endpoint.contains("127.0.0.1") {
+        return Ok(ValidateResponse {
+            is_active: true,
+            last_validated_at: Some("2099-01-01T00:00:00Z".to_string()),
+            is_dev_license: true,
+        });
+    }
+
     let api_access_key = get_api_access_key()?;
     let machine_id: String = app.machine_uid().get_machine_uid().unwrap().id.unwrap();
     let (license_key, instance_id, _) = get_stored_credentials(&app).await?;
@@ -335,15 +346,6 @@ pub async fn validate_license_api(app: AppHandle) -> Result<ValidateResponse, St
         machine_id: machine_id.clone(),
         app_version: app_version.clone(),
     };
-
-    // Local-dev: bypass license check when PAYMENT_ENDPOINT points to localhost
-    if payment_endpoint.contains("localhost") || payment_endpoint.contains("127.0.0.1") {
-        return Ok(ValidateResponse {
-            is_active: true,
-            last_validated_at: Some("2099-01-01T00:00:00Z".to_string()),
-            is_dev_license: true,
-        });
-    }
 
     if license_key.is_empty() || instance_id.is_empty() {
         return Ok(ValidateResponse {
