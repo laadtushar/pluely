@@ -56,7 +56,7 @@ jobs:
           echo "POSTHOG_API_KEY=${{ secrets.POSTHOG_API_KEY }}" >> src-tauri/.env
 
       - name: Install frontend deps
-        run: npm ci
+        run: npm install --legacy-peer-deps
 
       - name: Build & publish
         uses: tauri-apps/tauri-action@v0.5.16
