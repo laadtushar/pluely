@@ -1,5 +1,14 @@
 export const SPEECH_TO_TEXT_PROVIDERS = [
   {
+    id: "groq-whisper",
+    name: "Groq Whisper (Fast Cloud STT)",
+    curl: `curl -X POST "http://localhost:3001/groq/v1/audio/transcriptions" \\
+      -F "file={{AUDIO}}" \\
+      -F "model=whisper-large-v3-turbo"`,
+    responseContentPath: "text",
+    streaming: false,
+  },
+  {
     id: "local-whisper",
     name: "Local Whisper (faster-whisper)",
     curl: `curl -X POST "http://localhost:8000/v1/audio/transcriptions" \\

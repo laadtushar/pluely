@@ -34,7 +34,7 @@ function isGroqModel(model) {
     "llama-3.1-8b-instant",
     "llama-3.3-70b-versatile",
     "deepseek-r1-distill-llama-70b",
-    "llama-3.2-11b-vision-preview",
+    "meta-llama/llama-4-scout-17b-16e-instruct",
     "qwen-qwq-32b",
   ].includes(model);
 }
@@ -220,9 +220,9 @@ app.post("/api/models", (req, res) => {
       },
       {
         provider: "groq-vision",
-        name: "Groq Llama 3.2 Vision 11B (Cloud Vision)",
-        id: "llama-3.2-11b-vision-preview",
-        model: "llama-3.2-11b-vision-preview",
+        name: "Groq Llama 4 Scout Vision (Cloud Vision)",
+        id: "meta-llama/llama-4-scout-17b-16e-instruct",
+        model: "meta-llama/llama-4-scout-17b-16e-instruct",
         description: "Fast cloud vision — read whiteboard problems instantly",
         modality: "vision",
         isAvailable: !!getGroqApiKey(),
@@ -264,6 +264,48 @@ app.get("/api/activity", (req, res) => {
 app.post("/api/error", (req, res) => {
   console.warn("[api/error]", req.body?.error_message);
   res.json({ success: true });
+});
+
+// ─── Groq proxy (injects API key server-side, no key needed in UI) ────────────
+
+app.post("/groq/v1/chat/completions", async (req, res) => {
+  try {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${getGroqApiKey()}`,
+      },
+      body: JSON.stringify(req.body),
+    });
+    res.status(response.status);
+    res.setHeader("Content-Type", response.headers.get("content-type") || "application/json");
+    response.body.pipe(res);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/groq/v1/audio/transcriptions", (req, res) => {
+  const chunks = [];
+  req.on("data", (chunk) => chunks.push(chunk));
+  req.on("end", async () => {
+    try {
+      const body = Buffer.concat(chunks);
+      const response = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${getGroqApiKey()}`,
+          "Content-Type": req.headers["content-type"],
+        },
+        body,
+      });
+      const data = await response.json();
+      res.json(data);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
 });
 
 // ─── Health check ─────────────────────────────────────────────────────────────
