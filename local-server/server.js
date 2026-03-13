@@ -138,6 +138,15 @@ app.post("/api/models", (req, res) => {
         modality: "text",
         isAvailable: true,
       },
+      {
+        provider: "ollama",
+        name: "Llama 3.2 Vision 11B",
+        id: "llama3.2-vision:11b",
+        model: "llama3.2-vision:11b",
+        description: "Text + image — read screenshots, diagrams, whiteboard photos",
+        modality: "vision",
+        isAvailable: true,
+      },
     ],
   });
 });

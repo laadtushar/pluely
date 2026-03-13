@@ -97,7 +97,20 @@ pub async fn secure_storage_save(app: AppHandle, items: Vec<StorageItem>) -> Res
 pub async fn secure_storage_get(app: AppHandle) -> Result<StorageResult, String> {
     let storage_path = get_secure_storage_path(&app)?;
 
+    // Local-dev: inject a dummy license so the UI skips the license prompt
+    let is_local = match option_env!("PAYMENT_ENDPOINT") {
+        Some(ep) => ep.contains("localhost") || ep.contains("127.0.0.1"),
+        None => false,
+    };
+
     if !storage_path.exists() {
+        if is_local {
+            return Ok(StorageResult {
+                license_key: Some("local-dev".to_string()),
+                instance_id: Some("local-instance".to_string()),
+                selected_pluely_model: None,
+            });
+        }
         return Ok(StorageResult {
             license_key: None,
             instance_id: None,
@@ -112,8 +125,8 @@ pub async fn secure_storage_get(app: AppHandle) -> Result<StorageResult, String>
         .map_err(|e| format!("Failed to parse storage file: {}", e))?;
 
     Ok(StorageResult {
-        license_key: storage.license_key,
-        instance_id: storage.instance_id,
+        license_key: storage.license_key.or_else(|| if is_local { Some("local-dev".to_string()) } else { None }),
+        instance_id: storage.instance_id.or_else(|| if is_local { Some("local-instance".to_string()) } else { None }),
         selected_pluely_model: storage.selected_pluely_model,
     })
 }
